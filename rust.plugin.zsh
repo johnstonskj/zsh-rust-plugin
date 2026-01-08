@@ -5,14 +5,14 @@
 #
 # Description:
 #
-#   Add one-line description here...
+#   Zsh plugin to set additional Rust environment variables.
 #
 # Public variables:
 #
 # * `RUST`; plugin-defined global associative array with the following keys:
-#   * \`_ALIASES\`; a list of all aliases defined by the plugin.
-#   * \`_FUNCTIONS\`; a list of all functions defined by the plugin.
-#   * \`_PLUGIN_DIR\`; the directory the plugin is sourced from.
+#   * `_ALIASES`; a list of all aliases defined by the plugin.
+#   * `_FUNCTIONS`; a list of all functions defined by the plugin.
+#   * `_PLUGIN_DIR`; the directory the plugin is sourced from.
 # * `RUST_SRC_PATH`; path to rust source installed by rustup.
 #
 
