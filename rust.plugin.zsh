@@ -1,11 +1,8 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 #
 # Plugin Name: rust
+# Description: Zsh plugin to set additional Rust environment variables.
 # Repository: https://github.com/johnstonskj/zsh-rust-plugin
-#
-# Description:
-#
-#   Zsh plugin to set additional Rust environment variables.
 #
 # Public variables:
 #
@@ -13,6 +10,7 @@
 #   * `_ALIASES`; a list of all aliases defined by the plugin.
 #   * `_FUNCTIONS`; a list of all functions defined by the plugin.
 #   * `_PLUGIN_DIR`; the directory the plugin is sourced from.
+#   * `_OLD_RUST_SRC_PATH`; the previous value of the `RUST_SRC_PATH` environment variable.
 # * `RUST_SRC_PATH`; path to rust source installed by rustup.
 #
 
