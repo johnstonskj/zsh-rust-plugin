@@ -1,113 +1,56 @@
 # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
 #
-# Plugin Name: rust
-# Description: Zsh plugin to set additional Rust environment variables.
-# Repository: https://github.com/johnstonskj/zsh-rust-plugin
+# @name: rust
+# @brief: Set environment variables for the Rust programming language.
+# @repository: https://github.com/johnstonskj/zsh-rust-plugin
+# @version: 0.1.1
+# @license: MIT AND Apache-2.0
 #
-# Public variables:
+# ### Public variables
 #
-# * `RUST`; plugin-defined global associative array with the following keys:
-#   * `_ALIASES`; a list of all aliases defined by the plugin.
-#   * `_FUNCTIONS`; a list of all functions defined by the plugin.
-#   * `_PLUGIN_DIR`; the directory the plugin is sourced from.
-#   * `_OLD_RUST_SRC_PATH`; the previous value of the `RUST_SRC_PATH` environment variable.
 # * `RUST_SRC_PATH`; path to rust source installed by rustup.
 #
 
-############################################################################
-# Standard Setup Behavior
-############################################################################
+############A#######################################################################################
+# @section Lifecycle
+# @description Plugin lifecycle functions.
+#
 
-# See https://wiki.zshell.dev/community/zsh_plugin_standard#zero-handling
-0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
-0="${${(M)0:#/*}:-$PWD/$0}"
-
-# See https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugins-hash
-declare -gA RUST
-RUST[_PLUGIN_DIR]="${0:h}"
-RUST[_FUNCTIONS]=""
-
-# Saving the current state for any modified global environment variables.
-RUST[_OLD_RUST_SRC_PATH]="${RUST_SRC_PATH:-}"
-
-############################################################################
-# Internal Support Functions
-############################################################################
+@zplugins_declare_plugin_dependencies rust cargo shlog
 
 #
-# This function will add to the `RUST[_FUNCTIONS]` list which is
-# used at unload time to `unfunction` plugin-defined functions.
+# @description
 #
-# See https://wiki.zshell.dev/community/zsh_plugin_standard#unload-function
-# See https://wiki.zshell.dev/community/zsh_plugin_standard#the-proposed-function-name-prefixes
+# This function initializes the `RUST_SRC_PATH` variable.
 #
-.rust_remember_fn() {
-    builtin emulate -L zsh
-
-    local fn_name="${1}"
-    if [[ -z "${RUST[_FUNCTIONS]}" ]]; then
-        RUST[_FUNCTIONS]="${fn_name}"
-    elif [[ ",${RUST[_FUNCTIONS]}," != *",${fn_name},"* ]]; then
-        RUST[_FUNCTIONS]="${RUST[_FUNCTIONS]},${fn_name}"
-    fi
-}
-.rust_remember_fn .rust_remember_fn
-
-#
-# This function does the initialization of variables in the global variable
-# `RUST`. It also adds to `path` and `fpath` as necessary.
+# @noargs
 #
 rust_plugin_init() {
     builtin emulate -L zsh
     builtin setopt extended_glob warn_create_global typeset_silent no_short_loops rc_quotes no_auto_pushd
 
-    export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
+    if command -v rustc >/dev/null 2>&1; then
+        # Save current state of `RUST_SRC_PATH` and initialize if not set.
+        local src_path="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
+        @zplugins_envvar_save rust RUST_SRC_PATH
+        export RUST_SRC_PATH="${RUST_SRC_PATH:-${src_path}}"
+    else
+        log_error "zsh-rust: command 'rustc' not found, check for cargo plugin"
+    fi
 }
-.rust_remember_fn rust_plugin_init
 
-############################################################################
-# Plugin Unload Function
-############################################################################
-
-# See https://wiki.zshell.dev/community/zsh_plugin_standard#unload-function
+#
+# @description
+#
+# Called when the plugin is unloaded to clean up after itself.
+#
+# @noargs
+#
 rust_plugin_unload() {
     builtin emulate -L zsh
 
-    # Remove all remembered functions.
-    local plugin_fns
-    IFS=',' read -r -A plugin_fns <<< "${RUST[_FUNCTIONS]}"
-    local fn
-    for fn in ${plugin_fns[@]}; do
-        whence -w "${fn}" &> /dev/null && unfunction "${fn}"
-    done
-
-    # Reset global environment variables .
-    export RUST_SRC_PATH="${RUST[_OLD_RUST_SRC_PATH]}"
-
-    # Remove the global data variable.
-    unset RUST
-
-    # Remove this function.
-    unfunction rust_plugin_unload
+    # Reset global environment variables.
+    @zplugin_envvar_restore rust RUST_SRC_PATH
 }
-
-############################################################################
-# Public Functions
-############################################################################
-
-rust_example() {
-    builtin emulate -L zsh
-
-    printf "An example function in rust, var: ${RUST_EXAMPLE}"
-}
-.rust_remember_fn rust_example
-
-
-
-############################################################################
-# Initialize Plugin
-############################################################################
-
-rust_plugin_init
 
 true
