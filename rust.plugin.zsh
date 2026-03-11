@@ -35,7 +35,7 @@ RUST[_OLD_RUST_SRC_PATH]="${RUST_SRC_PATH:-}"
 # @description Plugin lifecycle functions.
 #
 
-@zplugins_declare_plugin_dependencies cargo shlog
+@zplugins_declare_plugin_dependencies rust cargo shlog
 
 # #
 # @description
