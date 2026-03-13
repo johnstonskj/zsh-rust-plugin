@@ -4,6 +4,6 @@ if ! [ -x "$(command -v cargo-cache)" ]; then
     cargo install cargo-cache
 fi
 
-cargo cache -a -f -k 1
+cargo cache --autoclean --fsck --keep-duplicate-crates 1
 
 rustup update
