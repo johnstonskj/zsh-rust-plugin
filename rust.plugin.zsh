@@ -6,29 +6,14 @@
 # @version: 0.1.1
 # @license: MIT AND Apache-2.0
 #
+# @description
+#
+# At this point the plugin _only_ manages the `RUST_SRC_PATH` environment variable.
+#
 # ### Public variables
 #
 # * `RUST_SRC_PATH`; path to rust source installed by rustup.
 #
-
-############################################################################
-# @section Lifecycle
-# @description Plugin lifecycle functions.
-# See https://wiki.zshell.dev/community/zsh_plugin_standard#zero-handling
-0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
-0="${${(M)0:#/*}:-$PWD/$0}"
-
-# See https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugins-hash
-typeset -gA RUST
-RUST[_PLUGIN_DIR]="${0:h}"
-RUST[_FUNCTIONS]=""
-
-# Saving the current state for any modified global environment variables.
-RUST[_OLD_RUST_SRC_PATH]="${RUST_SRC_PATH:-}"
-
-############A#######################################################################################
-# Internal Support Functions
-############A#######################################################################################
 
 ############A#######################################################################################
 # @section Lifecycle
@@ -37,7 +22,7 @@ RUST[_OLD_RUST_SRC_PATH]="${RUST_SRC_PATH:-}"
 
 @zplugins_declare_plugin_dependencies rust cargo shlog
 
-# #
+#
 # @description
 #
 # This function initializes the `RUST_SRC_PATH` variable.
@@ -51,7 +36,7 @@ rust_plugin_init() {
         # Save current state of `RUST_SRC_PATH` and initialize if not set.
         local src_path="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
         @zplugins_envvar_save rust RUST_SRC_PATH
-        export RUST_SRC_PATH="${RUST_SRC_PATH:-${src_path}}"
+        typeset -g RUST_SRC_PATH="${RUST_SRC_PATH:-${src_path}}"
     else
         log_error "zsh-rust: command 'rustc' not found, check for cargo plugin"
     fi
@@ -60,7 +45,7 @@ rust_plugin_init() {
 #
 # @description
 #
-# Called when the plugin is unloaded to clean up after itself.
+# Called when the plugin is unloaded to restore RUST_SRC_PATH`.
 #
 # @noargs
 #
