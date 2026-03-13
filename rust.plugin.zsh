@@ -19,7 +19,7 @@
 0="${${(M)0:#/*}:-$PWD/$0}"
 
 # See https://wiki.zshell.dev/community/zsh_plugin_standard#standard-plugins-hash
-declare -gA RUST
+typeset -gA RUST
 RUST[_PLUGIN_DIR]="${0:h}"
 RUST[_FUNCTIONS]=""
 
