@@ -1,0 +1,9 @@
+# shellcheck shell=bash # -*- mode: sh; eval: (sh-set-shell "zsh") -*-
+
+if ! [ -x "$(command -v cargo-cache)" ]; then
+    cargo install cargo-cache
+fi
+
+cargo cache -a -f -k 1
+
+rustup update
